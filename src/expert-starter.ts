@@ -56,35 +56,45 @@ export default class KnowledgeBase {
     return facts
   }
 
+  private isConcretePremiseSatisfied(facts: IKnowledgeFacts, premise: IKnowledgeItem) {
+    return facts[premise.attribute] === premise.value
+  }
+
+  private isCallbackPremiseSatisfied(facts: IKnowledgeFacts, premise: IKnowledgeItem) {
+    if (!premise.callback) {
+      return
+    }
+
+    // check for undefined predicate
+    if (!_.hasIn(this.predicates, premise.callback)) {
+      facts.unresolved.push(premise.attribute)
+      return
+    }
+
+    // check that the callback is a function
+    let callback = _.get(this.predicates, premise.callback)
+    if (!_.isFunction(callback)) {
+      facts.unresolved.push(premise.attribute)
+      return
+    }
+
+    // compare the predicate to its value if it has one to allow for not toggling
+    if (premise.value) {
+      return callback(facts) === premise.value
+    }
+
+    return callback(facts)
+  }
+
   private isSatisfied(facts: IKnowledgeFacts, premises: Array<IKnowledgeItem>): boolean {
     return premises.every(premise => {
       if (_.includes(facts.unresolved, premise.attribute)) {
         return false
       }
 
-      if (premise.callback) {
-        // check for undefined predicate
-        if (!_.hasIn(this.predicates, premise.callback)) {
-          facts.unresolved.push(premise.attribute)
-          return
-        }
-
-        // check that the callback is a function
-        let callback = _.get(this.predicates, premise.callback)
-        if (!_.isFunction(callback)) {
-          facts.unresolved.push(premise.attribute)
-          return
-        }
-
-        // compare the predicate to its value if it has one to allow for not toggling
-        if (premise.value) {
-          return callback(facts) === premise.value
-        }
-
-        return callback(facts)
-      }
-
-      return facts[premise.attribute] === premise.value
+      return premise.callback
+        ? this.isCallbackPremiseSatisfied(facts, premise)
+        : this.isConcretePremiseSatisfied(facts, premise)
     })
   }
 
