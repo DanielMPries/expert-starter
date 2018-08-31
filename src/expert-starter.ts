@@ -1,17 +1,4 @@
-// Import here Polyfills if needed. Recommended core-js (npm i -D core-js)
-// import "core-js/fn/array.find"
-// ...
-
-//github.com/primaryobjects/knowledgebase/blob/master/app.js
 import _ from 'lodash'
-
-export function S4(): string {
-  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
-}
-
-export function uuid(): string {
-  return `${S4()}${S4()}-${S4()}-4${S4().substr(0, 3)}-${S4()}-${S4()}${S4()}${S4()}`.toLowerCase()
-}
 
 export interface IKnowledgeItem {
   attribute: string
