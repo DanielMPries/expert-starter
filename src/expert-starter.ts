@@ -2,7 +2,8 @@ import _ from 'lodash'
 
 export interface IKnowledgeItem {
   attribute: string
-  value: any
+  value?: any
+  callback?: string
 }
 
 export interface IKnowledgeRule {
@@ -17,7 +18,7 @@ export interface IKnowledgeFacts {
 }
 
 export class KnowledgeRule implements IKnowledgeRule {
-  premises: IKnowledgeItem[]
+  premises: Array<IKnowledgeItem>
   conclusion: IKnowledgeItem
 
   constructor(premises: IKnowledgeItem[], conclusion: IKnowledgeItem) {
@@ -32,9 +33,11 @@ export class KnowledgeRule implements IKnowledgeRule {
 
 export default class KnowledgeBase {
   rules: Array<IKnowledgeRule>
+  predicates: object
 
-  constructor(rules: Array<IKnowledgeRule>) {
+  constructor(rules: Array<IKnowledgeRule>, predicates: object) {
     this.rules = rules
+    this.predicates = predicates
   }
 
   public evaluate(item: object): object {
@@ -59,6 +62,28 @@ export default class KnowledgeBase {
         return false
       }
 
+      if (premise.callback) {
+        // check for undefined predicate
+        if (!_.hasIn(this.predicates, premise.callback)) {
+          facts.unresolved.push(premise.attribute)
+          return
+        }
+
+        // check that the callback is a function
+        let callback = _.get(this.predicates, premise.callback)
+        if (!_.isFunction(callback)) {
+          facts.unresolved.push(premise.attribute)
+          return
+        }
+
+        // compare the predicate to its value if it has one to allow for not toggling
+        if (premise.value) {
+          return callback(facts) === premise.value
+        }
+
+        return callback(facts)
+      }
+
       return facts[premise.attribute] === premise.value
     })
   }
@@ -80,7 +105,7 @@ export default class KnowledgeBase {
         }
 
         // unresolved premise
-        if (!_.hasIn(item, premise.attribute)) {
+        if (!_.hasIn(item, premise.attribute) && !premise.callback) {
           facts.unresolved.push(premise.attribute)
           return
         }

@@ -18,6 +18,18 @@
   {
     "premises": [
       {
+        "attribute": "is a this thing really a plant",
+        "callback": "isPlant"
+      }
+    ],
+    "conclusion": {
+      "attribute": "isPlant",
+      "value": "this is a plant"
+    }
+  },
+  {
+    "premises": [
+      {
         "attribute": "class",
         "value": "gymnosperm"
       },
