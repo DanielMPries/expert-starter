@@ -12,6 +12,11 @@ export default class KnowledgeBase {
     this.predicates = predicates
   }
 
+  /**
+   * Evaluates the item against the rules in the knowledgebase and returns an object of facts
+   * from the evaluated rules
+   * @param item the item to inspect
+   */
   public evaluate(item: object): object {
     let facts = this.retrieveFacts(item)
 
@@ -29,10 +34,20 @@ export default class KnowledgeBase {
     return facts
   }
 
+  /**
+   * Tests a premise against a fact to determine if the premise is satisfied
+   * @param facts the facts object to inspect
+   * @param premise the premise to test
+   */
   private isConcretePremiseSatisfied(facts: IKnowledgeFacts, premise: IKnowledgeItem) {
     return facts[premise.attribute] === premise.value
   }
 
+  /**
+   * Test a callback premise against a fact object to determine if the premise is satisfied
+   * @param facts the facts object to inspect
+   * @param premise the premise to test
+   */
   private isCallbackPremiseSatisfied(facts: IKnowledgeFacts, premise: IKnowledgeItem) {
     if (!premise.callback) {
       return
@@ -59,6 +74,11 @@ export default class KnowledgeBase {
     return callback(facts)
   }
 
+  /**
+   * Tests every premise in the premises collection against the facts to determined if the premises are satisfied
+   * @param facts The facts object to insepect
+   * @param premises the premises collection to test
+   */
   private isSatisfied(facts: IKnowledgeFacts, premises: Array<IKnowledgeItem>): boolean {
     return premises.every(premise => {
       if (_.includes(facts.unresolved, premise.attribute)) {
@@ -71,6 +91,10 @@ export default class KnowledgeBase {
     })
   }
 
+  /**
+   * Retrieves a set of facts from concrete premises (i.e. non callback premises)
+   * @param item the item to inspect
+   */
   private retrieveFacts(item: object): IKnowledgeFacts {
     let facts = {
       unresolved: Array<string>()
