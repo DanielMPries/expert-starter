@@ -15,6 +15,6 @@ describe('Dummy test', () => {
 
     let kb = new KnowledgeBase(data, predicates)
     let facts = kb.evaluate(obj)
-    console.log(JSON.stringify(facts, undefined, '\t'))
+    expect(facts.hasOwnProperty('isPlant')).toBeTruthy()
   })
 })
