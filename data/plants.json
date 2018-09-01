@@ -18,6 +18,18 @@
   {
     "premises": [
       {
+        "attribute": "is a this thing really a person",
+        "callback": "isHuman"
+      }
+    ],
+    "conclusion": {
+      "attribute": "isHuman",
+      "value": "this thing has a government barcode"
+    }
+  },
+  {
+    "premises": [
+      {
         "attribute": "is a this thing really a plant",
         "callback": "isPlant"
       }
