@@ -17,6 +17,7 @@ export default class KnowledgeBase {
 
     this.rules.forEach(rule => {
       if (this.isSatisfied(facts, rule.premises)) {
+        // TODO: deal with callbacks without a value
         Object.defineProperty(facts, rule.conclusion.attribute, {
           value: rule.conclusion.value,
           writable: false,

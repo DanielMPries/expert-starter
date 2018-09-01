@@ -3,10 +3,6 @@ import Predicates from './fixtures/predicates'
 const data = require('../data/plants.json')
 
 describe('KnowledgeBase', () => {
-  it('works if true is truthy', () => {
-    expect(true).toBeTruthy()
-  })
-
   it('KnowledgeBase is instantiable', () => {
     expect(new KnowledgeBase(data, null)).toBeInstanceOf(KnowledgeBase)
   })
