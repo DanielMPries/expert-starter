@@ -1,35 +1,7 @@
 import _ from 'lodash'
-
-export interface IKnowledgeItem {
-  attribute: string
-  value?: any
-  callback?: string
-}
-
-export interface IKnowledgeRule {
-  premises: Array<IKnowledgeItem>
-  conclusion: IKnowledgeItem
-
-  getPremiseAttributes(): string[]
-}
-
-export interface IKnowledgeFacts {
-  unresolved: Array<string>
-}
-
-export class KnowledgeRule implements IKnowledgeRule {
-  premises: Array<IKnowledgeItem>
-  conclusion: IKnowledgeItem
-
-  constructor(premises: IKnowledgeItem[], conclusion: IKnowledgeItem) {
-    this.premises = premises
-    this.conclusion = conclusion
-  }
-
-  getPremiseAttributes(): string[] {
-    return this.premises.map(premise => premise.attribute)
-  }
-}
+import IKnowledgeItem from './IknowledgeItem'
+import IKnowledgeRule from './IKnowledgeRule'
+import IKnowledgeFacts from './IKnowledgeFacts'
 
 export default class KnowledgeBase {
   rules: Array<IKnowledgeRule>
