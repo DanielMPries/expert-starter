@@ -2,14 +2,22 @@ import _ from 'lodash'
 import IKnowledgeItem from './IknowledgeItem'
 import IKnowledgeRule from './IKnowledgeRule'
 import IKnowledgeFacts from './IKnowledgeFacts'
+import { EventEmitter } from 'events'
 
-export default class KnowledgeBase {
+export default class KnowledgeBase extends EventEmitter {
   rules: Array<IKnowledgeRule>
   predicates: object
+  emitOnSatisfied: boolean = true
+  emitOnUnsatisfied: boolean = true
+  emitOnUnresolved: boolean = true
 
-  constructor(rules: Array<IKnowledgeRule>, predicates: object) {
+  constructor(rules: Array<IKnowledgeRule>, predicates: object, emitOnSatisfied?: boolean) {
+    super()
     this.rules = rules
     this.predicates = predicates
+    this.emitOnSatisfied = true
+    this.emitOnUnsatisfied = true
+    this.emitOnUnresolved = true
   }
 
   /**
@@ -19,7 +27,6 @@ export default class KnowledgeBase {
    */
   public evaluate(item: object): object {
     let facts = this.retrieveFacts(item)
-
     this.rules.forEach(rule => {
       if (this.isSatisfied(facts, rule.premises)) {
         // TODO: deal with callbacks without a value
@@ -63,6 +70,10 @@ export default class KnowledgeBase {
     let callback = _.get(this.predicates, premise.callback)
     if (!_.isFunction(callback)) {
       facts.unresolved.push(premise.attribute)
+      if (this.emitOnUnresolved) {
+        this.emit('unresolved', premise)
+      }
+
       return
     }
 
@@ -80,7 +91,7 @@ export default class KnowledgeBase {
    * @param premises the premises collection to test
    */
   private isSatisfied(facts: IKnowledgeFacts, premises: Array<IKnowledgeItem>): boolean {
-    return premises.every(premise => {
+    let returnValue = premises.every(premise => {
       if (_.includes(facts.unresolved, premise.attribute)) {
         return false
       }
@@ -89,6 +100,17 @@ export default class KnowledgeBase {
         ? this.isCallbackPremiseSatisfied(facts, premise)
         : this.isConcretePremiseSatisfied(facts, premise)
     })
+
+    // emit event if applicable
+    if (returnValue && this.emitOnSatisfied) {
+      this.emit('satisfied', premises)
+    }
+
+    if (!returnValue && this.emitOnUnsatisfied) {
+      this.emit('unsatisfied', premises)
+    }
+
+    return returnValue
   }
 
   /**
