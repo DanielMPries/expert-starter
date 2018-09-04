@@ -2,6 +2,8 @@
 
 A starter project that makes creating a TypeScript based expert system library extremely easy.
 
+![Alt text](assets/DesignDiagram.png?raw=true "Design Diagram")
+
 ### Usage
 
 ```bash
